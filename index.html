@@ -1,13 +1,76 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>movie-playlist</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Movie Playlist</title>
+  <style>
+    :root { --sun: #f7d34a; --ink: #26282b; --amber: #f2a900; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--sun); font-family: 'Segoe UI', system-ui, sans-serif; }
+    .screen { min-height: 100vh; padding: 40px clamp(16px, 6vw, 80px); display: grid; gap: 48px; align-content: start; }
+    h1, h2 { margin: 0 0 16px; font-size: 1rem; color: var(--ink); }
+    .row { display: flex; flex-wrap: wrap; gap: 14px; }
+
+    .time { font-size: 1.7rem; line-height: 1; color: #fff; }
+    .title { font-size: .72rem; font-weight: 700; color: var(--amber); text-transform: uppercase; }
+    .tag { font-size: .72rem; font-weight: 700; color: #fff; text-transform: uppercase; }
+    .bar { height: 10px; }
+
+    .poster { width: 160px; transition: transform .2s; }
+    .poster-art { aspect-ratio: 2/3; background-size: cover; background-position: center; position: relative;
+                  display: flex; flex-direction: column; justify-content: flex-end; gap: 3px; padding: 10px; }
+    .genre { position: absolute; top: 10px; left: 10px; font-size: .65rem; font-weight: 700; color: #fff; }
+
+    .block { width: 140px; background: var(--ink); transition: transform .2s; }
+    .block-body { aspect-ratio: 1; padding: 10px; display: flex; flex-direction: column; justify-content: flex-end; gap: 3px; }
+    .block .time, .block .tag { color: var(--amber); }
+    .block .title { color: #fff; }
+
+    .poster:hover, .block:hover { transform: translateY(-4px); }
+    @media (prefers-reduced-motion: reduce) { .poster, .block { transition: none; } .poster:hover, .block:hover { transform: none; } }
+  </style>
+</head>
+<body>
+  <main class="screen">
+    <section><h1>What's on today?</h1><div class="row" id="posters"></div></section>
+    <section><h2>Square blocks</h2><div class="row" id="blocks"></div></section>
+  </main>
+
+  <script>
+    // Edit this list to change the playlist. Add poster: "images/trolls.jpg" for a real poster.
+    const movies = [
+      { time: "16:00", title: "Gagamboy",         tag: "Local favorite", genre: "Comedy",    color: "#b3261e", bar: "#e0443a", poster: "" },
+      { time: "18:00", title: "Spider-Man",       tag: "Premiere",       genre: "Action",    color: "#1e4fd6", bar: "#f26b21", poster: "" },
+      { time: "20:00", title: "Trolls",           tag: "Family night",   genre: "Animation", color: "#c43fa8", bar: "#1e7bd6", poster: "" },
+      { time: "22:00", title: "The Walking Dead", tag: "",               genre: "Horror",    color: "#1f4a2c", bar: "#3fd13f", poster: "" },
+    ];
+
+    const tagHtml = (m) => (m.tag ? `<span class="tag">${m.tag}</span>` : "");
+
+    document.getElementById("posters").innerHTML = movies.map((m) => {
+      const bg = m.poster
+        ? `linear-gradient(transparent 45%, rgba(0,0,0,.65)), url(${m.poster})`
+        : `linear-gradient(160deg, ${m.color}, #111 130%)`;
+      return `
+        <article class="poster">
+          <div class="poster-art" style="background-image:${bg}">
+            <span class="genre">${m.genre}</span>
+            <strong class="time">${m.time}</strong>
+            <span class="title">${m.title}</span>${tagHtml(m)}
+          </div>
+          <div class="bar" style="background:${m.bar}"></div>
+        </article>`;
+    }).join("");
+
+    document.getElementById("blocks").innerHTML = movies.map((m) => `
+      <article class="block">
+        <div class="block-body">
+          <strong class="time">${m.time}</strong>
+          <span class="title">${m.title}</span>${tagHtml(m)}
+        </div>
+        <div class="bar" style="background:${m.bar}"></div>
+      </article>`).join("");
+  </script>
+</body>
 </html>
